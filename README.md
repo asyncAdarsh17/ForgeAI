@@ -226,18 +226,7 @@ This allows saving AI explanations, debugging output, or generated code.
 
 ---
 
-# 🔮 Future Improvements
 
-Planned improvements for ForgeAI:
-
-* AI project codebase analyzer
-* Automatic bug detection and fixing
-* Git commit message generator
-* Repository documentation generator
-* Multi-model AI selection
-* Plugin system for developer extensions
-
----
 
 # 👨‍💻 Author
 
