@@ -16,9 +16,15 @@ export async function explain() {
 export async function explainText(code) {
   const spinner = ora("Explaining...").start();
 
-  const result = await askAI(`
-Explain the following code in detail, step by step, including logic and algorithm:
+ const result = await askAI(`
+Explain the following code clearly.
 
+Focus on:
+- purpose of the code
+- main logic
+- important patterns
+
+Code:
 ${code}
 `);
 

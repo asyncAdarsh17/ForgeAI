@@ -3,7 +3,8 @@ import { loadConfig } from "../storage/config.js";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 const MODEL = "openrouter/free";
-const TIMEOUT_MS = 30000; // 30s hard stop
+const TIMEOUT_MS = 30000;
+const MAX_RETRIES = 2;
 
 function fetchWithTimeout(url, options, timeout) {
   const controller = new AbortController();
@@ -14,6 +15,7 @@ function fetchWithTimeout(url, options, timeout) {
 }
 
 async function callModel(prompt, apiKey) {
+
   const response = await fetchWithTimeout(
     OPENROUTER_URL,
     {
@@ -32,16 +34,19 @@ async function callModel(prompt, apiKey) {
 You are Forge AI, a senior software engineer and mentor.
 
 Rules:
-- Be concise and structured.
-- For debugging:
-  1. Identify the issue
-  2. Explain why it happens
-  3. Show the fix
-  4. Provide corrected code
-- For explanations:
-  - Break concepts clearly
-  - Use simple technical language
-- Never add unnecessary fluff.
+- Always answer directly.
+- NEVER ask the user for more code or clarification.
+- If code is incomplete, still explain using the visible logic.
+- Assume the snippet represents the important part of the system.
+
+For explanations:
+1. Explain what the code does
+2. Explain the key logic
+3. Mention important algorithms or patterns
+4. Mention real-world use cases
+
+Be concise and structured.
+Avoid unnecessary conversation.
 `
           },
           { role: "user", content: prompt }
@@ -57,33 +62,49 @@ Rules:
     throw new Error(data?.error?.message || `HTTP ${response.status}`);
   }
 
-  if (!data.choices?.[0]?.message?.content) {
-    throw new Error("Invalid AI response.");
+  const content = data?.choices?.[0]?.message?.content;
+
+  if (!content || content.trim().length === 0) {
+    throw new Error("EMPTY_RESPONSE");
   }
 
-  return data.choices[0].message.content.trim();
+  return content.trim();
 }
 
 export async function askAI(prompt) {
+
   const { apiKey } = loadConfig();
 
   if (!apiKey) {
     throw new Error("OpenRouter API key not configured.");
   }
 
-  try {
-    return await callModel(prompt, apiKey);
-  } catch (err) {
-    return `
-⚠️ Forge AI (Free Mode)
+  let lastError;
 
-The free AI provider is temporarily unavailable.
+  for (let i = 0; i <= MAX_RETRIES; i++) {
 
-👉 Try again in a few minutes
-👉 Retry the command
-👉 Use a smaller input if possible
+    try {
 
-This is a free infrastructure limitation.
-`;
+      const result = await callModel(prompt, apiKey);
+
+      return result;
+
+    } catch (err) {
+
+      lastError = err;
+
+      if (err.message === "EMPTY_RESPONSE") {
+        continue;
+      }
+
+      if (i === MAX_RETRIES) break;
+
+    }
+
   }
+
+  console.log("\n⚠️ AI provider returned an empty response.");
+  console.log("Try again or use a smaller input.\n");
+
+  throw lastError;
 }
