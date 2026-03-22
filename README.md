@@ -14,7 +14,6 @@ It is designed to be **fast, minimal, and developer-friendly**.
 ---
 
 # ⚡ Quick Demo
-
 ```bash
 node bin/index.js explain index.js
 node bin/index.js debug server.js
@@ -23,7 +22,6 @@ node bin/index.js chat
 ```
 
 Example Output:
-
 ```
 Issue:
 The function returns undefined because the variable is not returned.
@@ -49,7 +47,7 @@ function add(a, b) {
 🧠 Summarize large files or text
 💬 Interactive AI chat
 🧾 Generate technical content or code
-📂 Analyze files directly from the terminal
+📂 Analyze entire project folders
 📝 Export AI conversation history
 🎨 Beautiful CLI interface with colored output
 
@@ -71,14 +69,12 @@ function add(a, b) {
 # 📦 Installation
 
 Clone the repository:
-
 ```bash
 git clone https://github.com/asyncAdarsh17/ForgeAI.git
 cd ForgeAI
 ```
 
 Install dependencies:
-
 ```bash
 npm install
 ```
@@ -86,12 +82,13 @@ npm install
 ---
 
 # ▶️ Run the CLI
-
 ```bash
 node bin/index.js
 ```
 
-This will start the interactive CLI interface.
+On first run, Forge AI will automatically ask for your OpenRouter API key and save it. You only need to do this once.
+
+Get your free API key from: https://openrouter.ai
 
 ---
 
@@ -100,25 +97,26 @@ This will start the interactive CLI interface.
 ForgeAI supports direct commands for quick usage.
 
 Explain a file:
-
 ```bash
 node bin/index.js explain index.js
 ```
 
 Debug a file:
-
 ```bash
 node bin/index.js debug server.js
 ```
 
 Summarize a file:
-
 ```bash
 node bin/index.js summarize notes.txt
 ```
 
-Start AI chat:
+Analyze a project folder:
+```bash
+node bin/index.js analyze ./my-project
+```
 
+Start AI chat:
 ```bash
 node bin/index.js chat
 ```
@@ -128,13 +126,11 @@ node bin/index.js chat
 # 🧠 Interactive Mode
 
 Run ForgeAI without arguments to open the interactive CLI menu:
-
 ```bash
 node bin/index.js
 ```
 
 You will see options like:
-
 ```
 ⚡ Explain Code (paste)
 📂 Explain a File
@@ -142,6 +138,8 @@ You will see options like:
 📂 Summarize a File
 ⚡ Debug Errors (paste)
 📂 Debug a File
+📁 Analyze Project Folder
+⚡ Generate Content
 ⚡ Chat with AI
 📥 Export Full History
 ❌ Exit
@@ -153,28 +151,13 @@ You will see options like:
 
 ForgeAI uses OpenRouter to access AI models.
 
-Create the config file:
+On first run the CLI will automatically ask for your API key and save it.
 
-```
-~/.forge-ai-pro/config.json
-```
-
-Example configuration:
-
-```json
-{
-  "apiKey": "your-openrouter-api-key"
-}
-```
-
-You can get an API key from:
-
-https://openrouter.ai
+You can get an API key from: https://openrouter.ai
 
 ---
 
 # 📁 Project Structure
-
 ```
 ForgeAI
 │
@@ -186,6 +169,7 @@ ForgeAI
 │   │   └── openrouter.js
 │   │
 │   ├── features
+│   │   ├── analyze.js
 │   │   ├── chat.js
 │   │   ├── debug.js
 │   │   ├── explain.js
@@ -226,14 +210,11 @@ This allows saving AI explanations, debugging output, or generated code.
 
 ---
 
-
-
 # 👨‍💻 Author
 
 Adarsh Landge
 
-GitHub:
-https://github.com/asyncAdarsh17
+GitHub: https://github.com/asyncAdarsh17
 
 ---
 
