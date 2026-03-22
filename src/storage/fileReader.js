@@ -4,24 +4,31 @@ import path from "path";
 const MAX_CHARS = 4000;
 const IGNORED_DIRS = ["node_modules", ".git", "dist", "build"];
 
-/*
-Read a single file safely
-*/
+function cleanPath(inputPath) {
+  let cleaned = inputPath.trim();
+
+  // Remove surrounding quotes
+  if (
+    (cleaned.startsWith('"') && cleaned.endsWith('"')) ||
+    (cleaned.startsWith("'") && cleaned.endsWith("'"))
+  ) {
+    cleaned = cleaned.slice(1, -1);
+  }
+
+  // If it's an absolute path, use it directly, don't resolve relative to cwd
+  if (path.isAbsolute(cleaned)) {
+    return cleaned;
+  }
+
+  return path.resolve(process.cwd(), cleaned);
+}
+
 export function readFileContent(filePath) {
   if (!filePath) {
     throw new Error("❌ No file path provided.");
   }
 
-  let cleanedPath = filePath.trim();
-
-  if (
-    (cleanedPath.startsWith('"') && cleanedPath.endsWith('"')) ||
-    (cleanedPath.startsWith("'") && cleanedPath.endsWith("'"))
-  ) {
-    cleanedPath = cleanedPath.slice(1, -1);
-  }
-
-  const fullPath = path.resolve(process.cwd(), cleanedPath);
+  const fullPath = cleanPath(filePath);
 
   if (!fs.existsSync(fullPath)) {
     throw new Error("❌ File not found: " + fullPath);
@@ -34,39 +41,39 @@ export function readFileContent(filePath) {
   const content = fs.readFileSync(fullPath, "utf8");
 
   if (content.length > MAX_CHARS) {
+    console.log("⚠️  File truncated to 4000 chars.");
     return content.slice(0, MAX_CHARS);
   }
 
   return content;
 }
 
-/*
-Scan a folder recursively
-*/
 export function scanProject(dir) {
-  let results = [];
+  const fullPath = cleanPath(dir);
 
-  const files = fs.readdirSync(dir);
+  if (!fs.existsSync(fullPath)) {
+    throw new Error("❌ Folder not found: " + fullPath);
+  }
+
+  let results = [];
+  const files = fs.readdirSync(fullPath);
 
   for (const file of files) {
     if (IGNORED_DIRS.includes(file)) continue;
 
-    const fullPath = path.join(dir, file);
-    const stat = fs.statSync(fullPath);
+    const filePath = path.join(fullPath, file);
+    const stat = fs.statSync(filePath);
 
     if (stat.isDirectory()) {
-      results = results.concat(scanProject(fullPath));
+      results = results.concat(scanProject(filePath));
     } else {
-      results.push(fullPath);
+      results.push(filePath);
     }
   }
 
   return results;
 }
 
-/*
-Split large content into chunks
-*/
 export function chunkContent(content) {
   const size = 1500;
   const chunks = [];

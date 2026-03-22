@@ -1,6 +1,5 @@
 import inquirer from "inquirer";
 import ora from "ora";
-import say from "say";
 import { askAI } from "../core/openrouter.js";
 import { saveHistory } from "../storage/history.js";
 import { printPretty } from "../ui/printer.js";
@@ -16,18 +15,23 @@ export async function debugCode() {
 export async function debugText(text) {
   const spinner = ora("Debugging...").start();
 
-  const result = await askAI(`
+  try {
+    const result = await askAI(`
 Find the bug, fix it, and explain:
 
 ${text}
 `);
 
-  spinner.stop();
+    spinner.stop();
 
-  saveHistory("user", text);
-  saveHistory("ai", result);
-  setLastResult(result);
+    saveHistory("user", text);
+    saveHistory("ai", result);
+    setLastResult(result);
 
-  printPretty(result);
-  say.speak(result.substring(0, 500));
+    await printPretty(result);
+
+  } catch (err) {
+    spinner.stop();
+    console.log("❌ Error:", err.message);
+  }
 }

@@ -1,6 +1,5 @@
 import inquirer from "inquirer";
 import ora from "ora";
-import say from "say";
 import { askAI } from "../core/openrouter.js";
 import { saveHistory } from "../storage/history.js";
 import { printPretty } from "../ui/printer.js";
@@ -16,7 +15,8 @@ export async function explain() {
 export async function explainText(code) {
   const spinner = ora("Explaining...").start();
 
- const result = await askAI(`
+  try {
+    const result = await askAI(`
 Explain the following code clearly.
 
 Focus on:
@@ -28,13 +28,16 @@ Code:
 ${code}
 `);
 
-  spinner.stop();
+    spinner.stop();
 
-  saveHistory("user", code);
-  saveHistory("ai", result);
-  setLastResult(result);
+    saveHistory("user", code);
+    saveHistory("ai", result);
+    setLastResult(result);
 
-  printPretty(result);
-  say.speak(result.substring(0, 500)); // speak first part only
+    await printPretty(result);
+
+  } catch (err) {
+    spinner.stop();
+    console.log("❌ Error:", err.message);
+  }
 }
-

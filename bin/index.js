@@ -2,6 +2,7 @@
 
 import inquirer from "inquirer";
 import { showBanner } from "../src/ui/banner.js";
+import { ensureSetup } from "../src/setup/firstRun.js";
 import { explain, explainText } from "../src/features/explain.js";
 import { summarize, summarizeText } from "../src/features/summarize.js";
 import { generate } from "../src/features/generate.js";
@@ -16,6 +17,7 @@ process.on("SIGINT", () => {
   say.stop();
   process.exit();
 });
+
 // -------- COMMAND MODE --------
 
 const cmd = process.argv[2];
@@ -23,6 +25,8 @@ const arg = process.argv[3];
 
 if (cmd) {
   try {
+
+    await ensureSetup();
 
     if (cmd === "explain" && arg) {
       const content = readFileContent(arg);
@@ -58,13 +62,13 @@ if (cmd) {
   }
 }
 
-
 // -------- MENU MODE --------
 
 while (true) {
 
   console.clear();
   showBanner();
+  await ensureSetup();
 
   const { choice } = await inquirer.prompt([
     {
@@ -80,13 +84,13 @@ while (true) {
         "⚡ Debug Errors (paste)",
         "📂 Debug a File",
         "📁 Analyze Project Folder",
+        "⚡ Generate Content",
         "⚡ Chat with AI",
         "📥 Export Full History",
         "❌ Exit"
       ]
     }
   ]);
-
 
   if (choice.includes("Explain Code")) {
     await explain();
@@ -96,7 +100,6 @@ while (true) {
     const { path } = await inquirer.prompt([
       { type: "input", name: "path", message: "File path:" }
     ]);
-
     const content = readFileContent(path);
     await explainText(content);
   }
@@ -109,7 +112,6 @@ while (true) {
     const { path } = await inquirer.prompt([
       { type: "input", name: "path", message: "File path:" }
     ]);
-
     const content = readFileContent(path);
     await summarizeText(content);
   }
@@ -122,7 +124,6 @@ while (true) {
     const { path } = await inquirer.prompt([
       { type: "input", name: "path", message: "File path:" }
     ]);
-
     const content = readFileContent(path);
     await debugText(content);
   }
@@ -131,8 +132,11 @@ while (true) {
     const { path } = await inquirer.prompt([
       { type: "input", name: "path", message: "Project folder path:" }
     ]);
-
     await analyzeFolder(path);
+  }
+
+  else if (choice.includes("Generate Content")) {
+    await generate();
   }
 
   else if (choice.includes("Chat")) {

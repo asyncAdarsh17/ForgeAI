@@ -3,12 +3,11 @@ import ora from "ora";
 import { scanProject, readFileContent, chunkContent } from "../storage/fileReader.js";
 import { askAI } from "../core/openrouter.js";
 import { printPretty } from "../ui/printer.js";
+import { saveHistory } from "../storage/history.js";
+import { setLastResult } from "../storage/exporter.js";
 
 const MAX_PARALLEL = 3;
 
-/*
-Binary files that should never be sent to AI
-*/
 const BINARY_EXT = [
   ".png",".jpg",".jpeg",".gif",".bmp",".svg",".ico",
   ".pdf",".zip",".tar",".gz",".rar",".7z",
@@ -16,9 +15,6 @@ const BINARY_EXT = [
   ".mp4",".mp3",".mov",".avi",".wav"
 ];
 
-/*
-Folders that contain huge useless data
-*/
 const IGNORED_DIRS = [
   "node_modules",
   ".git",
@@ -30,10 +26,6 @@ const IGNORED_DIRS = [
   ".turbo"
 ];
 
-
-/*
-Process a single code chunk
-*/
 async function processChunk(file, chunk) {
 
   try {
@@ -55,10 +47,6 @@ ${chunk}
 
 }
 
-
-/*
-Run tasks in parallel safely
-*/
 async function runParallel(tasks, limit, spinner) {
 
   const results = [];
@@ -93,11 +81,6 @@ async function runParallel(tasks, limit, spinner) {
   return Promise.all(results);
 }
 
-
-
-/*
-Main function
-*/
 export async function analyzeFolder(folderPath) {
 
   const spinner = ora("🔍 Scanning project...").start();
@@ -115,7 +98,6 @@ export async function analyzeFolder(folderPath) {
 
   }
 
-
   if (!files.length) {
 
     spinner.fail("No files found.");
@@ -123,9 +105,7 @@ export async function analyzeFolder(folderPath) {
 
   }
 
-
   const tasks = [];
-
 
   for (const file of files) {
 
@@ -149,9 +129,7 @@ export async function analyzeFolder(folderPath) {
 
     }
 
-
     const chunks = chunkContent(content);
-
 
     for (const chunk of chunks) {
 
@@ -161,7 +139,6 @@ export async function analyzeFolder(folderPath) {
 
   }
 
-
   if (!tasks.length) {
 
     spinner.fail("No readable source files found.");
@@ -169,20 +146,15 @@ export async function analyzeFolder(folderPath) {
 
   }
 
-
   spinner.text = `🧠 Preparing analysis (${tasks.length} chunks)...`;
-
 
   const summaries = await runParallel(tasks, MAX_PARALLEL, spinner);
 
-
   const cleanSummaries = summaries
     .filter(Boolean)
-    .slice(0, 50);   // prevent token overflow
-
+    .slice(0, 50);
 
   spinner.text = "🧩 Building project explanation...";
-
 
   const result = await askAI(`
 These are summaries of files in a software project:
@@ -199,9 +171,11 @@ Explain clearly:
 Keep it structured and developer-friendly.
 `);
 
-
   spinner.stop();
 
+  saveHistory("user", `analyze: ${folderPath}`);
+  saveHistory("ai", result);
+  setLastResult(result);
 
   await printPretty(result);
 

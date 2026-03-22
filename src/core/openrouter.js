@@ -2,7 +2,7 @@ import fetch from "node-fetch";
 import { loadConfig } from "../storage/config.js";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL = "openrouter/free";
+const MODEL = "openrouter/auto";
 const TIMEOUT_MS = 30000;
 const MAX_RETRIES = 2;
 
@@ -22,7 +22,9 @@ async function callModel(prompt, apiKey) {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://github.com/forge-ai-pro",
+        "X-Title": "Forge AI Pro"
       },
       body: JSON.stringify({
         model: MODEL,
