@@ -15,30 +15,71 @@ It is designed to be **fast, minimal, and developer-friendly**.
 
 # ⚡ Quick Demo
 ```bash
-node bin/index.js explain index.js
+# Explain a file directly from terminal
+node bin/index.js explain src/index.js
+
+# Debug an error from a file
 node bin/index.js debug server.js
-node bin/index.js summarize notes.txt
+
+# Summarize a large documentation file
+node bin/index.js summarize docs/readme.txt
+
+# Analyze entire project architecture
+node bin/index.js analyze ./my-project
+
+# Start interactive AI chat
 node bin/index.js chat
 ```
 
-Example Output:
+### 🐞 Debug Output Example
 ```
-Issue:
-The function returns undefined because the variable is not returned.
+🤖 Forge AI:
 
-Why it happens:
-The function assigns a value but does not include a return statement.
+● Bug Detected: Missing return statement in calculateTotal()
+● Root Cause: Function computes value but never returns it — always resolves to undefined
+● Fix Applied:
 
-Fix:
-Add a return statement to return the computed value.
+  function calculateTotal(price, tax) {
+    return price + (price * tax);
+  }
 
-Corrected Code:
-function add(a, b) {
-  return a + b;
-}
+● Pattern: Pure function — deterministic, no side effects
+● Tip: Always validate return paths in functions with conditional branches
 ```
 
----
+### 🧠 Explain Output Example
+```
+🤖 Forge AI:
+
+● Purpose: Implements JWT-based authentication middleware for Express.js
+● Key Logic:
+  1. Extracts Bearer token from Authorization header
+  2. Verifies token signature using secret key
+  3. Attaches decoded user payload to req.user
+  4. Calls next() to pass control to the next middleware
+
+● Pattern: Middleware chain — separation of concerns
+● Real World Use: Protecting private API routes in production REST APIs
+```
+
+### 📁 Analyze Output Example
+```
+🤖 Forge AI:
+
+● Project: E-Commerce REST API
+● Architecture: MVC — Models, Controllers, Routes separated cleanly
+● Main Components:
+  1. server.js        → Entry point, Express setup, middleware registration
+  2. routes/          → All API route definitions
+  3. controllers/     → Business logic handlers
+  4. models/          → Mongoose schema definitions
+  5. middleware/       → Auth, error handling, request validation
+
+● Tech Stack Detected: Node.js, Express, MongoDB, JWT
+● Observations:
+  - No centralized error handler found — recommend adding one
+  - Config values hardcoded in files — recommend using dotenv
+```
 
 # 🚀 Features
 
