@@ -15,7 +15,7 @@ const BINARY_EXT = [
   ".mp4",".mp3",".mov",".avi",".wav"
 ];
 
-const IGNORED_DIRS = [
+const IGNORED_DIRS: = [
   "node_modules",
   ".git",
   "dist",

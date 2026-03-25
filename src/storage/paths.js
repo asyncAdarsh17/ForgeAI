@@ -2,7 +2,7 @@ import os from "os";
 import path from "path";
 import fs from "fs-extra";
 
-const base = path.join(os.homedir(), ".forge-ai-pro");
+const base = path.join(os.homedir(), ".forge-ai");
 
 export const paths = {
   base,

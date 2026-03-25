@@ -1,10 +1,10 @@
 {
-  "name": "forge-ai-pro",
+  "name": "forge-ai",
   "version": "1.0.0",
   "description": "Production-grade AI CLI ",
   "type": "module",
   "bin": {
-    "forge-ai-pro": "./bin/index.js"
+    "forge-ai": "./bin/index.js"
   },
   "author": "Adarsh Landge",
   "license": "MIT",

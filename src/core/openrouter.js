@@ -23,8 +23,8 @@ async function callModel(prompt, apiKey) {
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://github.com/forge-ai-pro",
-        "X-Title": "Forge AI Pro"
+        "HTTP-Referer": "https://github.com/asyncAdarsh17/ForgeAI",
+        "X-Title": "Forge AI"
       },
       body: JSON.stringify({
         model: MODEL,

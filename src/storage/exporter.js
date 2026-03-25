@@ -2,7 +2,7 @@ import fs from "fs-extra";
 import os from "os";
 import path from "path";
 
-const baseDir = path.join(os.homedir(), ".forge-ai-pro");
+const baseDir = path.join(os.homedir(), ".forge-ai");
 const exportsDir = path.join(baseDir, "exports");
 const historyPath = path.join(baseDir, "history.json");
 
